@@ -4,7 +4,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin"); //for serving c
 const Dotenv = require("dotenv-webpack"); //for working with .env
 
 module.exports = {
-    entry: "./src/script.js",
+    entry: "./src/js/index.js",
     output: {
         filename: "main.js",
         path: path.resolve(__dirname, "dist"), //create a dist file in the root folder used for deployment and building
