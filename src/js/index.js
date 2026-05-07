@@ -10,39 +10,78 @@ let editingTodoId = null;
 
 function init() {
     loadFromStorage();
-    
+
     if (projects.length === 0) {
-        const defaultProject = createProject('My Tasks');
+        const defaultProject = createDefaultProject();
         projects.push(defaultProject);
         currentProjectId = defaultProject.id;
         saveToStorage();
     } else {
         currentProjectId = projects[0].id;
     }
-    
+
     render();
     setupEventListeners();
 }
 
+function createDefaultProject() {
+    const defaultProject = createProject('My Tasks');
+    const starterTodos = [
+        createTodo(
+            'Finish my assignment before monday',
+            'i have java, web-devI, and nexsus too.',
+            getDateFromToday(0),
+            'high',
+            'This is starter for my to-do app'
+        ),
+        createTodo(
+            'watch over my nieces',
+            'get some ice cream for them and take them to the playground',
+            getDateFromToday(2),
+            'medium',
+            ''
+        ),
+        createTodo(
+            'Buy a new pair of shoes.',
+            'this one i want to buy for ballet classes',
+            getDateFromToday(7),
+            'low',
+            ''
+        )
+    ];
+
+    for (let i = 0; i < starterTodos.length; i++) {
+        defaultProject.addTodo(starterTodos[i]);
+    }
+
+    return defaultProject;
+}
+
+function getDateFromToday(daysFromToday) {
+    const date = new Date();
+    date.setDate(date.getDate() + daysFromToday);
+    return date.toISOString().slice(0, 10);
+}
+
 function loadFromStorage() {
     const data = loadProjects();
-    
+
     if (data && Array.isArray(data)) {
         projects = [];
-        
+
         for (let i = 0; i < data.length; i++) {
             const projectData = data[i];
-            
+
             const project = createProject(projectData.name);
             project.id = projectData.id;
             project.createdAt = projectData.createdAt;
-            
+
             if (projectData.todos && Array.isArray(projectData.todos)) {
                 project.todos = [];
-                
+
                 for (let j = 0; j < projectData.todos.length; j++) {
                     const todoData = projectData.todos[j];
-                    
+
                     const todo = createTodo(
                         todoData.title,
                         todoData.description,
@@ -50,15 +89,15 @@ function loadFromStorage() {
                         todoData.priority,
                         todoData.notes
                     );
-                    
+
                     todo.id = todoData.id;
                     todo.createdAt = todoData.createdAt;
                     todo.completed = todoData.completed;
-                    
+
                     project.todos.push(todo);
                 }
             }
-            
+
             projects.push(project);
         }
     }
@@ -79,7 +118,7 @@ function getCurrentProject() {
 
 function render() {
     DOM.renderProjects(projects, currentProjectId);
-    
+
     const currentProject = getCurrentProject();
     if (currentProject) {
         DOM.renderTodos(currentProject.todos, currentProject.name);
@@ -87,88 +126,88 @@ function render() {
 }
 
 function setupEventListeners() {
-    DOM.elements.addProjectBtn.addEventListener('click', function() {
+    DOM.elements.addProjectBtn.addEventListener('click', function () {
         DOM.showProjectModal();
     });
-    
-    DOM.elements.projectForm.addEventListener('submit', function(e) {
+
+    DOM.elements.projectForm.addEventListener('submit', function (e) {
         e.preventDefault();
         handleProjectSubmit();
     });
-    
-    DOM.elements.projectsList.addEventListener('click', function(e) {
+
+    DOM.elements.projectsList.addEventListener('click', function (e) {
         const projectItem = e.target.closest('.project-item');
         if (projectItem && !e.target.closest('.delete-project-btn')) {
             const projectId = projectItem.dataset.projectId;
             handleProjectSelect(projectId);
         }
-        
+
         if (e.target.closest('.delete-project-btn')) {
             const projectId = e.target.closest('.delete-project-btn').dataset.projectId;
             handleProjectDelete(projectId);
         }
     });
-    
-    DOM.elements.addTodoBtn.addEventListener('click', function() {
+
+    DOM.elements.addTodoBtn.addEventListener('click', function () {
         editingTodoId = null;
         DOM.showTodoModal();
     });
-    
-    DOM.elements.todoForm.addEventListener('submit', function(e) {
+
+    DOM.elements.todoForm.addEventListener('submit', function (e) {
         e.preventDefault();
         handleTodoSubmit();
     });
-    
-    DOM.elements.todosList.addEventListener('click', function(e) {
+
+    DOM.elements.todosList.addEventListener('click', function (e) {
         const todoItem = e.target.closest('.todo-item');
         if (todoItem && !e.target.closest('.todo-actions')) {
             const todoId = todoItem.dataset.todoId;
             handleTodoClick(todoId);
         }
-        
+
         if (e.target.closest('.edit-todo-icon')) {
             e.stopPropagation();
             const todoId = e.target.closest('.edit-todo-icon').dataset.todoId;
             handleTodoEdit(todoId);
         }
-        
+
         if (e.target.closest('.delete-todo-icon')) {
             e.stopPropagation();
             const todoId = e.target.closest('.delete-todo-icon').dataset.todoId;
             handleTodoDelete(todoId);
         }
     });
-    
-    DOM.elements.editTodoBtn.addEventListener('click', function() {
+
+    DOM.elements.editTodoBtn.addEventListener('click', function () {
         const todoId = DOM.elements.editTodoBtn.dataset.todoId;
         DOM.hideTodoDetailsModal();
         handleTodoEdit(todoId);
     });
-    
+
     setupModalCloseEvents();
 }
 
 function setupModalCloseEvents() {
     const closeButtons = document.querySelectorAll('.close-btn, .cancel-btn');
     for (let i = 0; i < closeButtons.length; i++) {
-        closeButtons[i].addEventListener('click', function(e) {
+        closeButtons[i].addEventListener('click', function (e) {
             const modal = e.target.closest('.modal');
             if (modal) {
                 modal.classList.remove('active');
             }
         });
     }
-    
+
     const modals = document.querySelectorAll('.modal');
     for (let i = 0; i < modals.length; i++) {
-        modals[i].addEventListener('click', function(e) {
+        modals[i].addEventListener('click', function (e) {
             if (e.target === modals[i]) {
                 modals[i].classList.remove('active');
             }
         });
     }
-    
-    document.addEventListener('keydown', function(e) {
+
+    document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
             const activeModals = document.querySelectorAll('.modal.active');
             for (let i = 0; i < activeModals.length; i++) {
@@ -180,15 +219,15 @@ function setupModalCloseEvents() {
 
 function handleProjectSubmit() {
     const formData = DOM.getProjectFormData();
-    
+
     if (!formData.name) {
         alert('Please enter a project name');
         return;
     }
-    
+
     const project = createProject(formData.name);
     projects.push(project);
-    
+
     saveToStorage();
     DOM.hideProjectModal();
     render();
@@ -207,18 +246,18 @@ function handleProjectDelete(projectId) {
             break;
         }
     }
-    
+
     if (!project) return;
-    
+
     const confirmDelete = confirm(
         'Are you sure you want to delete "' + project.name + '"? This will delete all todos in this project.'
     );
-    
+
     if (confirmDelete) {
-        projects = projects.filter(function(p) {
+        projects = projects.filter(function (p) {
             return p.id !== projectId;
         });
-        
+
         if (currentProjectId === projectId) {
             if (projects.length > 0) {
                 currentProjectId = projects[0].id;
@@ -228,7 +267,7 @@ function handleProjectDelete(projectId) {
                 currentProjectId = defaultProject.id;
             }
         }
-        
+
         saveToStorage();
         render();
     }
@@ -236,15 +275,15 @@ function handleProjectDelete(projectId) {
 
 function handleTodoSubmit() {
     const formData = DOM.getTodoFormData();
-    
+
     if (!formData.title || !formData.dueDate) {
         alert('Please fill in all required fields');
         return;
     }
-    
+
     const project = getCurrentProject();
     if (!project) return;
-    
+
     if (editingTodoId) {
         project.updateTodo(editingTodoId, formData);
         editingTodoId = null;
@@ -258,7 +297,7 @@ function handleTodoSubmit() {
         );
         project.addTodo(todo);
     }
-    
+
     saveToStorage();
     DOM.hideTodoModal();
     render();
@@ -267,7 +306,7 @@ function handleTodoSubmit() {
 function handleTodoClick(todoId) {
     const project = getCurrentProject();
     if (!project) return;
-    
+
     const todo = project.findTodo(todoId);
     if (todo) {
         DOM.showTodoDetailsModal(todo);
@@ -277,7 +316,7 @@ function handleTodoClick(todoId) {
 function handleTodoEdit(todoId) {
     const project = getCurrentProject();
     if (!project) return;
-    
+
     const todo = project.findTodo(todoId);
     if (todo) {
         editingTodoId = todoId;
@@ -288,12 +327,12 @@ function handleTodoEdit(todoId) {
 function handleTodoDelete(todoId) {
     const project = getCurrentProject();
     if (!project) return;
-    
+
     const todo = project.findTodo(todoId);
     if (!todo) return;
-    
+
     const confirmDelete = confirm('Are you sure you want to delete "' + todo.title + '"?');
-    
+
     if (confirmDelete) {
         project.removeTodo(todoId);
         saveToStorage();
