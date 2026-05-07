@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Todo List</title>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar for Projects -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>Projects</h1>
+                <button id="add-project-btn" class="btn btn-primary" aria-label="Add new project">+ New Project</button>
+            </div>
+            <div id="projects-list" class="projects-list"></div>
+        </aside>
+
+        <!-- Main Content Area for Todos -->
+        <main class="main-content">
+            <div class="main-header">
+                <h2 id="current-project-title">Select a Project</h2>
+                <button id="add-todo-btn" class="btn btn-primary" aria-label="Add new todo">+ New Todo</button>
+            </div>
+            <div id="todos-list" class="todos-list"></div>
+        </main>
+    </div>
+
+    <!-- Modal for Adding/Editing Project -->
+    <div id="project-modal" class="modal" role="dialog" aria-labelledby="project-modal-title" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="project-modal-title">New Project</h3>
+                <button class="close-btn" aria-label="Close modal">&times;</button>
+            </div>
+            <form id="project-form">
+                <div class="form-group">
+                    <label for="project-name">Project Name:</label>
+                    <input type="text" id="project-name" name="project-name" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary cancel-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Adding/Editing Todo -->
+    <div id="todo-modal" class="modal" role="dialog" aria-labelledby="todo-modal-title" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="todo-modal-title">New Todo</h3>
+                <button class="close-btn" aria-label="Close modal">&times;</button>
+            </div>
+            <form id="todo-form">
+                <div class="form-group">
+                    <label for="todo-title">Title:</label>
+                    <input type="text" id="todo-title" name="todo-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="todo-description">Description:</label>
+                    <textarea id="todo-description" name="todo-description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="todo-due-date">Due Date:</label>
+                    <input type="date" id="todo-due-date" name="todo-due-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="todo-priority">Priority:</label>
+                    <select id="todo-priority" name="todo-priority">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="todo-notes">Notes:</label>
+                    <textarea id="todo-notes" name="todo-notes" rows="2"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary cancel-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Todo Details Modal -->
+    <div id="todo-details-modal" class="modal" role="dialog" aria-labelledby="todo-details-title" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="todo-details-title">Todo Details</h3>
+                <button class="close-btn" aria-label="Close modal">&times;</button>
+            </div>
+            <div id="todo-details-content" class="todo-details">
+                <!-- Details will be populated dynamically -->
+            </div>
+            <div class="form-actions">
+                <button id="edit-todo-btn" class="btn btn-primary">Edit</button>
+                <button class="btn btn-secondary cancel-btn">Close</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
